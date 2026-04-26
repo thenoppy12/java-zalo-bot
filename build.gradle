@@ -56,5 +56,5 @@ dependencies {
     implementation("com.ngrok:ngrok-java-native:1.1.1:${osdetector.classifier}")
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.21.2'
     implementation 'org.slf4j:slf4j-api:2.0.7'
-    implementation("com.squareup.okhttp3:okhttp:5.1.0")
+    api("com.squareup.okhttp3:okhttp:5.1.0")
 }
