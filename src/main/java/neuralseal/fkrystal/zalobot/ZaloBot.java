@@ -32,13 +32,16 @@ public class ZaloBot {
 	private final List<Handler> _handlers = new ArrayList<>();
 	private final String _token;
 	private final String _baseUrlWithToken;
-	private final OkHttpClient _client = Constants.sharedOkHttp;
 	private final ObjectMapper _mapper;
 	private final String _botManagementName;
 	private WebhookServerData _webhookServerData;
 	private final String _USER_AGENT = "NeuralSeal's Fkrystal zalo-bot v"+Constants.VERSION;
 	private HttpServer _webhookServer;
 	private final MediaType _JSON = MediaType.get("application/json; charset=utf-8");
+    /**
+     * Don't create new HttpClient for bot to fetch online contents. Use this internal one for better perfomance!
+     */
+	public final OkHttpClient client = Constants.sharedOkHttp;
     /**
      * Access {@link ZaloBot.StandaloneAPI} here, don't create new one.
      */
@@ -333,7 +336,7 @@ public class ZaloBot {
 
 	private <T> CompletableFuture<T> _async(Request req, TypeReference<Generic<T>> rep) {
 		CompletableFuture<T> future = new CompletableFuture<>();
-		_client.newCall(req).enqueue(new Callback() {
+		client.newCall(req).enqueue(new Callback() {
 			@Override
 			public void onFailure(@NotNull Call call, @NotNull IOException e) {future.completeExceptionally(e);}
 			@Override
