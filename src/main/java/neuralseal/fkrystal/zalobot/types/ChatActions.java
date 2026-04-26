@@ -2,7 +2,7 @@ package neuralseal.fkrystal.zalobot.types;
 
 public enum ChatActions {
     TYPING("typing"),
-    @SuppressWarnings("preview") UPLOAD_PHOTO("upload_photo");
+    UPLOAD_PHOTO("upload_photo"); // Still preview
 
     private final String action;
     ChatActions(String action) {

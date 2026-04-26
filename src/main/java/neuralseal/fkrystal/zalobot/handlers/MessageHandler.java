@@ -2,11 +2,13 @@ package neuralseal.fkrystal.zalobot.handlers;
 
 import neuralseal.fkrystal.zalobot.ZaloBot;
 import neuralseal.fkrystal.zalobot.handler.Handler;
-import neuralseal.fkrystal.zalobot.impl.CallbackContext;
 import neuralseal.fkrystal.zalobot.models.Update;
 import java.util.function.Predicate;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Handle messages, like checking message have specific text or something.
+ */
 public class MessageHandler implements Handler {
     private final Predicate<Update> filters;
     private final MessageCallback callback;

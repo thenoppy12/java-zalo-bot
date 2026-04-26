@@ -2,6 +2,7 @@ import neuralseal.fkrystal.zalobot.ZaloBot;
 import neuralseal.fkrystal.zalobot.ZaloBotBuilder;
 import neuralseal.fkrystal.zalobot.handler.Handler;
 import neuralseal.fkrystal.zalobot.handlers.MessageHandler;
+import neuralseal.fkrystal.zalobot.impl.WebhookServerData;
 import neuralseal.fkrystal.zalobot.types.ChatActions;
 import neuralseal.fkrystal.zalobot.utils.NgrokUtils;
 
@@ -30,7 +31,7 @@ public class Test {
         ZaloBot bot = new ZaloBotBuilder()
                 .withToken(BOT_TOKEN)
                 .withHandler(messageHandler)
-                .withWebhookServer(WEBHOOK_SERVER_PORT, WEBHOOK_SERVER_PATH, WEBHOOK_SECRET)
+                .withWebhookServerData(new WebhookServerData(WEBHOOK_SERVER_PORT, WEBHOOK_SERVER_PATH, WEBHOOK_SECRET))
                 // Bot management name, can be null if not specify.
                 .withManagementName("this can be ignored, bot management name will be null and its allowed.")
                 .build();
@@ -44,7 +45,7 @@ public class Test {
         } else {
             System.err.println("\nFailed to set webhook. Check your Bot Token!");
         }
-        Runtime.getRuntime().addShutdownHook(new Thread(bot::stopWebhookServer));
+        Runtime.getRuntime().addShutdownHook(new Thread(bot::stop));
         bot.keepMeAlivePlease();
     }
 }

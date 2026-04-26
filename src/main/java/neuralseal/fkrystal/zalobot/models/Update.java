@@ -8,8 +8,4 @@ public record Update(
         @JsonProperty("update_id") long updateId,
         @JsonProperty("event_name") String eventName,
         @JsonProperty("message") Message message
-) {
-    public boolean isReceived() {
-        return "message.text.received".equals(eventName);
-    }
-}
+) {}
