@@ -1,10 +1,51 @@
 plugins {
     id 'java'
+    id 'java-library'
+    id 'maven-publish'
     id("com.google.osdetector").version("1.7.3")
 }
 
-group = 'com.zing.zalo.bot.api'
-version = '0.0.1'
+group = 'neuralseal.fkrystal.zalobot'
+version = '21.6'
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'neuralseal.fkrystal'
+            artifactId = "zalo-api"
+            version = '21.6'
+
+            from(components["java"])
+
+            pom {
+                name.set("JavaZaloAPI")
+                description.set("python-zalo-api but its java-lish!")
+                url.set("https://github.com/thenoppy12/java-zalo-bot")
+                licenses {
+                    license {
+                        name.set("CC0 1.0 Unversal")
+                        url.set("https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt")
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "FkrystalMaven"
+            url = uri("https://maven.fkrystal.qzz.io/releases")
+            credentials {
+                username = System.getenv("hfsUser")
+                password = System.getenv("hfsPassword")
+            }
+        }
+    }
+}
 
 repositories {
     mavenCentral()
@@ -13,7 +54,7 @@ repositories {
 dependencies {
     implementation("com.ngrok:ngrok-java:1.1.1")
     implementation("com.ngrok:ngrok-java-native:1.1.1:${osdetector.classifier}")
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.21.2'
     implementation 'org.slf4j:slf4j-api:2.0.7'
     implementation("com.squareup.okhttp3:okhttp:5.1.0")
 }
