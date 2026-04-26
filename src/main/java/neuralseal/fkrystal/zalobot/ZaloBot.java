@@ -3,8 +3,6 @@ package neuralseal.fkrystal.zalobot;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import neuralseal.fkrystal.zalobot.handler.Handler;
 import neuralseal.fkrystal.zalobot.models.*;
@@ -42,7 +40,7 @@ public class ZaloBot {
 	// TODO [FAKE] : Class's private & static fields
 	private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
-	public ZaloBot(String token, @Nullable String botManagementName) {
+	protected ZaloBot(String token, @Nullable String botManagementName) {
 		Constants.botMap.put((!Objects.isNull(botManagementName))? botManagementName : "ZaloBot-"+(Constants.botMap.size()+1), this);
 		this.token = token;
 		this.baseUrlWithToken = "https://bot-api.zaloplatforms.com/bot"+token;
@@ -56,6 +54,11 @@ public class ZaloBot {
 
 	public void addHandler(Handler handler) {
 		this.handlers.add(handler);
+	}
+	public void addHandler(List<Handler> listOfHandler) {
+		for (Handler handler : listOfHandler) {
+			addHandler(handler);
+		}
 	}
 	private void processUpdate(Update update) {
 		for (Handler handler : handlers) {

@@ -1,4 +1,6 @@
 import neuralseal.fkrystal.zalobot.ZaloBot;
+import neuralseal.fkrystal.zalobot.ZaloBotBuilder;
+import neuralseal.fkrystal.zalobot.handler.Handler;
 import neuralseal.fkrystal.zalobot.handlers.MessageHandler;
 import neuralseal.fkrystal.zalobot.types.ChatActions;
 import neuralseal.fkrystal.zalobot.utils.NgrokUtils;
@@ -12,22 +14,27 @@ public class Test {
         int WEBHOOK_SERVER_PORT = 8080;
         String WEBHOOK_SERVER_PATH = "/catchMe";
 
-        ZaloBot bot = new ZaloBot(BOT_TOKEN, "this can be null");
-
-        bot.addHandler(new MessageHandler(
+        Handler messageHandler = new MessageHandler(
                 u -> u.message().text() != null,
                 (update, context) -> {
                     String chatId = update.message().chat().id();
-                    bot.api.sendChatAction(chatId, ChatActions.TYPING).join();
+                    context.bot().api.sendChatAction(chatId, ChatActions.TYPING).join();
                     try {
                         Thread.sleep(5000);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
-                    bot.api.sendMessage(chatId, "You said: " + update.message().text()).join();
-                }));
+                    context.bot().api.sendMessage(chatId, "You said: " + update.message().text()).join();
+                });
 
-        bot.startWebhookServer(WEBHOOK_SERVER_PORT, WEBHOOK_SERVER_PATH, WEBHOOK_SECRET);
+        ZaloBot bot = new ZaloBotBuilder()
+                .withToken(BOT_TOKEN)
+                .withHandler(messageHandler)
+                .withWebhookServer(WEBHOOK_SERVER_PORT, WEBHOOK_SERVER_PATH, WEBHOOK_SECRET)
+                // Bot management name, can be null if not specify.
+                .withManagementName("this can be ignored, bot management name will be null and its allowed.")
+                .build();
+
         String NGROK_PUBLISH_URL = NgrokUtils.tunnelHttpToNgrok(NGROK_TOKEN, WEBHOOK_SERVER_PORT);
         System.out.println("Ngrok Tunnel established at: " + NGROK_PUBLISH_URL);
 
