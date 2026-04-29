@@ -1,4 +1,4 @@
-package neuralseal.fkrystal.zalobot.types;
+package neuralseal.fkrystal.zalobot;
 
 public enum ChatActions {
     TYPING("typing"),

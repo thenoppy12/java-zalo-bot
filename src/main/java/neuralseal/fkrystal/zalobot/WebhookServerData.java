@@ -1,4 +1,4 @@
-package neuralseal.fkrystal.zalobot.impl;
+package neuralseal.fkrystal.zalobot;
 
 import org.jetbrains.annotations.Nullable;
 

@@ -1,8 +1,5 @@
 package neuralseal.fkrystal.zalobot;
 
-import neuralseal.fkrystal.zalobot.handler.Handler;
-import neuralseal.fkrystal.zalobot.impl.WebhookServerData;
-
 import java.util.ArrayList;
 import java.util.List;
 

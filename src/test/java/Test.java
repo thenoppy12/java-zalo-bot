@@ -1,9 +1,9 @@
 import neuralseal.fkrystal.zalobot.ZaloBot;
 import neuralseal.fkrystal.zalobot.ZaloBotBuilder;
-import neuralseal.fkrystal.zalobot.handler.Handler;
+import neuralseal.fkrystal.zalobot.Handler;
 import neuralseal.fkrystal.zalobot.handlers.MessageHandler;
-import neuralseal.fkrystal.zalobot.impl.WebhookServerData;
-import neuralseal.fkrystal.zalobot.types.ChatActions;
+import neuralseal.fkrystal.zalobot.WebhookServerData;
+import neuralseal.fkrystal.zalobot.ChatActions;
 import neuralseal.fkrystal.zalobot.utils.NgrokUtils;
 
 public class Test {

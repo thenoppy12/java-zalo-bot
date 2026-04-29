@@ -1,7 +1,7 @@
 package neuralseal.fkrystal.zalobot.handlers;
 
 import neuralseal.fkrystal.zalobot.ZaloBot;
-import neuralseal.fkrystal.zalobot.handler.Handler;
+import neuralseal.fkrystal.zalobot.Handler;
 import neuralseal.fkrystal.zalobot.models.Update;
 
 import java.util.Arrays;

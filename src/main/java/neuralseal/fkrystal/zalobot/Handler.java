@@ -1,6 +1,5 @@
-package neuralseal.fkrystal.zalobot.handler;
+package neuralseal.fkrystal.zalobot;
 
-import neuralseal.fkrystal.zalobot.ZaloBot;
 import neuralseal.fkrystal.zalobot.models.Update;
 import org.jetbrains.annotations.Nullable;
 
