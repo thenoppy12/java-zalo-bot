@@ -149,7 +149,6 @@ public class ZaloBot {
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
     /**
      * Standalone API mean you can use it separately lmao, but I don't sure about that.<br><br>
 	 * Basically all of this is just HTTP requests that reply to user with interaction I guess.
@@ -239,12 +238,18 @@ public class ZaloBot {
 		}
 
         /**
-		 * Send chat message.
+         * Send chat message. <br>
+         * If the text more than 2000 characters, it fails and return {@code null}<br>
+         * For more info about that limit, visit <a href="https://bot.zapps.me/docs/apis/sendMessage/#:~:text=N%E1%BB%99i%20dung%20v%C4%83n%20b%E1%BA%A3n%20c%E1%BB%A7a%20tin%20nh%E1%BA%AFn%20s%E1%BA%BD%20%C4%91%C6%B0%E1%BB%A3c%20g%E1%BB%ADi%2C%20v%E1%BB%9Bi%20%C4%91%E1%BB%99%20d%C3%A0i%20t%E1%BB%AB%201%20%C4%91%E1%BA%BFn%202000%20k%C3%BD%20t%E1%BB%B1">here</a>
          * @param chatId Obtained by using {@code update.message().chat().id()} in your custom {@link Handler} class
-		 * @param text Text to send.
-         * @return {@link Message}, can be ignored
+         * @param text Text to send.
+         * @return {@link Message}, can be ignored or {@code null}, handle it yourself lmao
          */
 		public CompletableFuture<Message> sendMessage(String chatId, String text) {
+			if (text.length() > 2000) {
+				System.out.println("Text to send, its too long: " + text.length());
+				return null;
+			}
 			ObjectNode requestData = _mapper.createObjectNode();
 			requestData.put("chat_id", chatId);
 			requestData.put("text", text);
