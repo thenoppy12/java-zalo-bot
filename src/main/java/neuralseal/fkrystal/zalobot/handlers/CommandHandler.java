@@ -2,7 +2,7 @@ package neuralseal.fkrystal.zalobot.handlers;
 
 import neuralseal.fkrystal.zalobot.ZaloBot;
 import neuralseal.fkrystal.zalobot.Handler;
-import neuralseal.fkrystal.zalobot.models.Update;
+import neuralseal.fkrystal.zalobot.models.Received;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,25 +22,25 @@ public class CommandHandler implements Handler {
     }
 
     @Override
-    public boolean checkUpdate(Update update) {
-        if (update.message() == null || update.message().text() == null) return false;
-        String text = update.message().text().toLowerCase().trim();
+    public boolean checkUpdate(Received received) {
+        if (received.message() == null || received.message().text() == null) return false;
+        String text = received.message().text().toLowerCase().trim();
         return text.startsWith("/" + command);
     }
 
     @Override
-    public CompletableFuture<Void> handleUpdate(Update update, ZaloBot bot) {
+    public CompletableFuture<Void> handleUpdate(Received received, ZaloBot bot) {
         return CompletableFuture.runAsync(() -> {
-            String text = update.message().text().trim();
+            String text = received.message().text().trim();
             String[] parts = text.split("\\s+");
             List<String> args = (parts.length > 1) ? Arrays.asList(parts).subList(1, parts.length) : Collections.emptyList();
             CallbackContext context = new CallbackContext(bot, args);
-            callback.accept(update, context);
+            callback.accept(received, context);
         });
     }
 
     @FunctionalInterface
     public interface CommandCallback {
-        void accept(Update update, CallbackContext context);
+        void accept(Received received, CallbackContext context);
     }
 }

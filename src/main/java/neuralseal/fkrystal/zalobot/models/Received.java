@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record Update(
+public record Received(
         @JsonProperty("update_id") long updateId,
-        @JsonProperty("event_name") String eventName,
+        @JsonProperty("event_name") EventType eventName,
         @JsonProperty("message") Message message
 ) {}

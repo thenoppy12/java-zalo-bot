@@ -134,10 +134,10 @@ public class ZaloBot {
 		}
 	}
 
-	private void _processUpdate(Update update) {
+	private void _processUpdate(Received received) {
 		for (Handler handler : _handlers) {
-			if (handler.checkUpdate(update)) {
-				handler.handleUpdate(update, this)
+			if (handler.checkUpdate(received)) {
+				handler.handleUpdate(received, this)
 						.exceptionally(ex -> {
 							System.err.println("Handler crashed: " + ex.getMessage());
 							return null;
@@ -173,7 +173,7 @@ public class ZaloBot {
          * @return what is this?
          */
 		@Deprecated
-		public CompletableFuture<Update> getUpdates(int timeout, @Nullable Integer offset) {
+		public CompletableFuture<Received> getUpdates(int timeout, @Nullable Integer offset) {
 			ObjectNode requestData = _mapper.createObjectNode();
 			requestData.put("timeout", timeout);
 			if (offset != null) {
@@ -328,9 +328,9 @@ public class ZaloBot {
                         }
                         CompletableFuture.runAsync(() -> {
                             try {
-                                Update update = _mapper.readValue(jsonBody, Update.class);
-                                if (update != null) {
-                                    _processUpdate(update);
+                                Received received = _mapper.readValue(jsonBody, Received.class);
+                                if (received != null) {
+                                    _processUpdate(received);
                                 }
                             } catch (Exception e) {
                                 System.err.println("JSON Parse Error: " + e.getMessage());
