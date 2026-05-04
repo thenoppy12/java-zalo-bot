@@ -147,6 +147,10 @@ public class ZaloBot {
 		}
 	}
 
+	private boolean over2000(String string) {
+		return string.length() > 2000;
+	}
+
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
     /**
@@ -246,7 +250,7 @@ public class ZaloBot {
          * @return {@link Message}, can be ignored or {@code null}, handle it yourself lmao
          */
 		public CompletableFuture<Message> sendMessage(String chatId, String text) {
-			if (text.length() > 2000) {
+			if (over2000(text)) {
 				System.out.println("Text to send, its too long: " + text.length());
 				return null;
 			}
@@ -270,7 +274,32 @@ public class ZaloBot {
 			RequestBody body = RequestBody.create(requestData.toString(), _JSON);
 			return _doPost("sendChatAction", body, new TypeReference<>() {});
 		}
-		// TODO: send Photo, Sticker (it's impossible for now lol)
+
+        /**
+		 * Send a photo message (also add a caption if {@code photoCaption} is not {@code null}
+		 *  If the text more than 2000 characters, it fails and return {@code null}<br>
+		 * For more info about that limit, visit <a href="">here</a>
+         * @param chatId Obtained by using {@code update.message().chat().id()} in your custom {@link Handler} class
+         * @param photoUrl Direct URL of your photo
+         * @param photoCaption A smoll text under the photo, can be null or not more than 2000 characters
+         * @return
+         */
+		@SuppressWarnings("unchecked")
+		public CompletableFuture<Message> sendPhoto(String chatId, String photoUrl, @Nullable String photoCaption) {
+			ObjectNode requestData = _mapper.createObjectNode();
+			requestData.put("chat_id", chatId);
+			requestData.put("photo", photoUrl);
+			if (photoCaption != null) {
+				if (over2000(photoCaption)) {
+					System.out.println("photoCaption is exceed 2000 characters, this will be ignored and not append into payload.");
+				} else {
+					requestData.put("caption", photoCaption);
+				}
+			}
+			RequestBody body = RequestBody.create(requestData.toString(), _JSON);
+			return _doPost("sendPhoto", body, new TypeReference<>() {});
+		}
+		// TODO: Sticker (it's impossible for now lol)
 	}
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
