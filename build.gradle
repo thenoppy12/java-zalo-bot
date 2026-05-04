@@ -58,3 +58,13 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.7'
     api("com.squareup.okhttp3:okhttp:5.1.0")
 }
+
+jar {
+    manifest {
+        attributes(
+                "Copyright-By": "fkrystal (BussyBakks)",
+                "Github-Repo": "https://github.com/thenoppy12/java-zalo-bot",
+                "Contact-Me": "https://www.facebook.com/fkrystal.noppy/"
+        )
+    }
+}
