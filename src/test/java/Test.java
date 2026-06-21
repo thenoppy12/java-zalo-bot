@@ -36,6 +36,8 @@ public class Test {
                 .withManagementName("this can be ignored, bot management name will be null and its allowed.")
                 .build();
 
+        bot.start();
+
         String NGROK_PUBLISH_URL = NgrokUtils.tunnelHttpToNgrok(NGROK_TOKEN, WEBHOOK_SERVER_PORT);
         System.out.println("Ngrok Tunnel established at: " + NGROK_PUBLISH_URL);
 
