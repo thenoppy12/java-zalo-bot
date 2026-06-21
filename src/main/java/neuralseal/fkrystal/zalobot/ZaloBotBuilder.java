@@ -5,7 +5,7 @@ import java.util.List;
 
 
 /**
- * A simple {@link ZaloBot} builder, hehe
+ * Builder cho {@link ZaloBot}, hẹ hẹ
  */
 public class ZaloBotBuilder {
     private String _botManagementName = null;
@@ -15,9 +15,9 @@ public class ZaloBotBuilder {
 
 
     /**
-     * Set bot's management name
-     * @param botManagementName Name of management bot alias
-     * @return Current {@link ZaloBotBuilder} instance
+     * Đặt tên bot, để dễ quản lý trong code
+     * @param botManagementName Tên bot
+     * @return {@link ZaloBotBuilder} hiện tại
      */
     public ZaloBotBuilder withManagementName(String botManagementName) {
         this._botManagementName = botManagementName;
@@ -27,7 +27,7 @@ public class ZaloBotBuilder {
     /**
      * Set the bot token
      * @param botToken Valid bot token
-     * @return Current {@link ZaloBotBuilder} instance
+     * @return {@link ZaloBotBuilder} hiện tại
      */
     public ZaloBotBuilder withToken(String botToken) {
         this._botToken = botToken;
@@ -35,9 +35,9 @@ public class ZaloBotBuilder {
     }
 
     /**
-     * Add bot's handler for events.
-     * @param handler A class implement {@link Handler}
-     * @return Current {@link ZaloBotBuilder} instance
+     * Thêm handler cho bot
+     * @param handler Class được implement {@link Handler}
+     * @return {@link ZaloBotBuilder} hiện tại
      */
     public ZaloBotBuilder withHandler(Handler handler) {
         this._handlers.add(handler);
@@ -45,9 +45,9 @@ public class ZaloBotBuilder {
     }
 
     /**
-     * Set webhook server data (port, path, secret)
-     * @param data {@link WebhookServerData}, read that record please
-     * @return Current {@link ZaloBotBuilder} instance
+     * Đưa data cho webhook server
+     * @param data {@link WebhookServerData}
+     * @return {@link ZaloBotBuilder} hiện tại
      */
     public ZaloBotBuilder withWebhookServerData(WebhookServerData data) {
         this._webhookServerData = data;
@@ -55,8 +55,8 @@ public class ZaloBotBuilder {
     }
 
     /**
-     * Build the bot.
-     * @return Configured {@link ZaloBot}
+     * Build bot
+     * @return {@link ZaloBot} đã tinh chỉnh theo builder
      */
     public ZaloBot build() {
         if (_botToken == null) throw new NullPointerException("Bot token is null. Specify a bot token for this.");

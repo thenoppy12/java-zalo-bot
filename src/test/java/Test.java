@@ -25,7 +25,7 @@ public class Test {
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
-                    context.bot().api.sendMessage(chatId, "You said: " + update.message().text()).join();
+                    context.bot().api.sendMessage(chatId, "You said: " + update.message().text(), null).join();
                 });
 
         ZaloBot bot = new ZaloBotBuilder()

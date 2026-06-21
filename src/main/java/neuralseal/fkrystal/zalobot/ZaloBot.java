@@ -23,9 +23,10 @@ import java.util.concurrent.Executors;
 
 
 /**
- * A Zalo bot instance.
+ * Lõi của cái bot này
  */
 public class ZaloBot {
+	private boolean _isServerStarted = false;
 	private final List<Handler> _handlers = new ArrayList<>();
 	private final String _token;
 	private final String _baseUrlWithToken;
@@ -36,11 +37,11 @@ public class ZaloBot {
 	private HttpServer _webhookServer;
 	private final MediaType _JSON = MediaType.get("application/json; charset=utf-8");
     /**
-     * Don't create new HttpClient for bot to fetch online contents. Use this internal one for better perfomance!
+     * Đừng tạo thêm OkHttp client, dùng cái đi kèm cho tiện
      */
 	public final OkHttpClient client = Constants.sharedOkHttp;
     /**
-     * Access {@link ZaloBot.StandaloneAPI} here, don't create new one.
+     * Dùng {@link ZaloBot.StandaloneAPI} bằng cái này, đừng tạo thêm cái khác
      */
 	public final StandaloneAPI api = new StandaloneAPI();
 
@@ -59,42 +60,43 @@ public class ZaloBot {
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Start the bot, which just simply start the webhook server.
+     * Chạy bot, đơn giản thì chỉ là chạy webhook server
      */
 	public void start() {
 		this._startWebhookServer(_webhookServerData);
 	}
 
     /**
-     * Stop the bot, which just simply stop the webhook server.
+     * Tắt bot, đơn giản thì chỉ là tắt webhook server
      */
 	public void stop() {
 		if (this._webhookServer != null) {
 			this._webhookServer.stop(0);
-			System.out.println("Webhook server stopped.");
+			this._isServerStarted = false;
+			System.out.println("Webhook server đã dừng.");
 		}
 	}
 
 	/**
-	 * Get the bot's management name, for easier management?
-	 * @return User-set bot's management name
+	 * Lấy cái tên bot để quản lý
+	 * @return Tên bot user tự đặt
 	 */
 	public String name() {
 		return this._botManagementName;
 	}
 
 	/**
-	 * Get the bot's token.
-	 * @return Bot's token.
+	 * Lấy token của bot
+	 * @return chứ chả lẽ cho bạn cái nịt?
 	 */
 	public String token() {
 		return this._token;
 	}
 
     /**
-	 * Add a {@link Handler} to the bot, like receiving event and dispatcher I guess.
-     * @param handler A class implement {@link Handler}
-	 * @return Current {@link ZaloBot} instance
+	 * Thêm {@link Handler} cho bot
+     * @param handler Class được implement {@link Handler}
+	 * @return {@link ZaloBot} hiện tại
      */
 	public ZaloBot addHandler(Handler handler) {
 		this._handlers.add(handler);
@@ -102,9 +104,9 @@ public class ZaloBot {
 	}
 
     /**
-	 * Add a list of {@link Handler} to the bot, like receiving event and dispatcher I guess.
-     * @param listOfHandler yes. list of class implement {@link Handler}
-	 * @return Current {@link ZaloBot} instance
+	 * Thêm cả danh sách các {@link Handler} cho bot
+     * @param listOfHandler yes. danh sách class được implement {@link Handler}
+	 * @return {@link ZaloBot} hiện tại
      */
 	public ZaloBot addHandler(List<Handler> listOfHandler) {
 		for (Handler handler : listOfHandler) {
@@ -114,9 +116,9 @@ public class ZaloBot {
 	}
 
     /**
-	 * Set the bot's webhook server arguments, like port, webhook path, and webhook secret.
+	 * Set data cho webhook server, của từng bot
      * @param data {@link WebhookServerData}
-	 * @return Current {@link ZaloBot} instance
+	 * @return {@link ZaloBot} hiện tại
      */
 	public ZaloBot setWebHookServerData(WebhookServerData data) {
 		this._webhookServerData = data;
@@ -124,13 +126,16 @@ public class ZaloBot {
 	}
 
     /**
-     * Loop the current thread, avoid bot to stop?
+     * Ayo đừng để nó chết chứ?
      */
 	public void keepMeAlivePlease() {
+		if (!this._isServerStarted) {
+			System.out.println("Cảnh báo: Webhook server có thể vẫn chưa được khởi động!!! Việc này sẽ khiến bot không thể nhận event từ Zalo!!!");
+		}
 		try {
 			Thread.currentThread().join();
 		} catch (InterruptedException e) {
-			System.err.println("Interrupted");
+			System.err.println("Đã dừng (thủ công)");
 		}
 	}
 
@@ -139,7 +144,7 @@ public class ZaloBot {
 			if (handler.checkUpdate(received)) {
 				handler.handleUpdate(received, this)
 						.exceptionally(ex -> {
-							System.err.println("Handler crashed: " + ex.getMessage());
+							System.err.println("Handler đã nổ: " + ex.getMessage());
 							return null;
 						});
 				break;
@@ -147,30 +152,32 @@ public class ZaloBot {
 		}
 	}
 
-	private boolean over2000(String string) {
+	private boolean over2000char(String string) {
 		return string.length() > 2000;
 	}
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Standalone API mean you can use it separately lmao, but I don't sure about that.<br><br>
-	 * Basically all of this is just HTTP requests that reply to user with interaction I guess.
+     * Standalone API nghĩa là API có thể dùng riêng, nhưng tôi không chắc về điều đó.<br><br>
+	 * Đơn giản thì nó là đống HTTP thôi, để reply interaction của user ấy.
      */
 	public class StandaloneAPI {
         /**
-		 * Get the bot's user information
-         * @return {@link User} of bot
+		 * Lấy thông tin user bot trên Zalo server
+         * @return {@link User} của bot
          */
 		public CompletableFuture<User> getMe() {
 			return _doPost("getMe", null, new TypeReference<>() {});
 		}
 
         /**
-		 * Honestly I don't know how to use this "long polling" feature, so I set it to {@link Deprecated} but not for removal because it's still accessible on Zalo I guess.
-         * @param timeout what is this?
-         * @param offset what is this?
-         * @return what is this?
+		 * Nói thật thì tôi cũng chả biết cái "long polling" này hoạt động như thế nào<br>
+		 * nên tôi sẽ set nó {@link Deprecated} nhưng không gỡ bỏ do Zalo vẫn còn dùng cái này.<br>
+		 * (Ai biết chỉ tôi với...)
+         * @param timeout cái gì đây?
+         * @param offset cái gì đây?
+         * @return cái gì đây? đố mà biết được (21/06/26)
          */
 		@Deprecated
 		public CompletableFuture<Received> getUpdates(int timeout, @Nullable Integer offset) {
@@ -184,42 +191,43 @@ public class ZaloBot {
 		}
 
         /**
-		 * Yes, get the bot's configured webhook data. It's contain webhook url and updated timestamp ( no secret btw ).
-         * @return {@link Webhook} data of bot
+		 * Đúng như tên, lấy thông tin webhook ở trên Zalo server (không có webhook secret đâu, khỏi lo)
+         * @return Dữ liệu {@link Webhook} của bot
          */
 		public CompletableFuture<Webhook> getWebhook() {
 			return _doPost("getWebhookInfo", null, new TypeReference<>() {});
 		}
 
         /**
-		 * Set webhook url and webhook secret. <br>(Don't confuse with {@link WebhookServerData}, it's for webhook server (receiver), not webhook sender).
-         * @param webhookUrl Your webhook server url, normally this API will use ngrok for free
-         * @param webhookSecretToken Your webhook secret, for security
-         * @return {@code true} if webhook data is sent and edited, {@code false} if not
+		 * Đặt webhook url và webhook secret<br>
+		 * (Đừng nhầm với {@link WebhookServerData}, nó dành cho webhook server, không dành cho Zalo)
+         * @param webhookUrl Webhook server url, thường thì dùng ngrok cho nó free, mà limit 1 server à...
+         * @param webhookSecretToken Webhook secret, add thêm cho nó bảo mật tho.
+         * @return {@code true} nếu đã được sửa đổi/tạo mới, ngược lại thì {@code false}
          */
 		public boolean setWebhook(String webhookUrl, String webhookSecretToken) {
 			try {
 				Webhook info = api.getWebhook().join();
 				if (info.url() == null || info.url().isEmpty()) {
-					System.out.println("Webhook URL is empty. Setting to: " + webhookUrl);
+					System.out.println("Webhook URL trống, đang add vào...");
 					ObjectNode requestData = _mapper.createObjectNode();
 					requestData.put("url", webhookUrl);
 					requestData.put("secret_token", webhookSecretToken);
 					RequestBody body = RequestBody.create(requestData.toString(), _JSON);
 					return (_doPost("setWebhook", body, new TypeReference<Generic<Webhook>>() {}).join()).url().equals(webhookUrl);
 				} else if (!info.url().equals(webhookUrl)) {
-					System.out.println("Webhook URL mismatch! Replacing old URL with: " + webhookUrl);
+					System.out.println("Webhook URL hiện tại khác với cái đang sử dụng. Đang đổi lại...");
 					ObjectNode requestData = _mapper.createObjectNode();
 					requestData.put("url", webhookUrl);
 					requestData.put("secret_token", webhookSecretToken);
 					RequestBody body = RequestBody.create(requestData.toString(), _JSON);
                     return (_doPost("setWebhook", body, new TypeReference<Generic<Webhook>>() {}).join()).url().equals(webhookUrl);
 				} else {
-					System.out.println("Webhook is already correctly configured to " + webhookUrl);
+					System.out.println("Webhook đã được set thành \"" + webhookUrl + "\" sẳn rồi.");
 					return true;
 				}
 			} catch (Exception e) {
-				System.out.println("No existing webhook found (API returned error). Setting it up now...");
+				System.out.println("Không tìm thấy bất kì webhook link nào hiện có, đang add thêm...");
 				try {
 					ObjectNode requestData = _mapper.createObjectNode();
 					requestData.put("url", webhookUrl);
@@ -227,45 +235,53 @@ public class ZaloBot {
 					RequestBody body = RequestBody.create(requestData.toString(), _JSON);
 					return (_doPost("setWebhook", body, new TypeReference<Generic<Webhook>>() {}).join()).url().equals(webhookUrl);
 				} catch (Exception ex) {
-					System.err.println("CRITICAL: Failed to set webhook! " + ex.getMessage());
+					System.err.println("CRITICAL: Không thể set webhook: " + ex.getMessage());
 					return false;
 				}
 			}
 		}
 
         /**
-		 * Like the name of this method.
-         * @return {@code true} if webhook data got deleted, {@code false} if not
+		 * Như cái tên.
+         * @return {@code true} nếu webhook đi tong, ngược lại thì {@code false}
          */
 		public boolean deleteWebhook() {
 			return (_doPost("deleteWebhook", null, new TypeReference<Generic<Webhook>>() {}).join()).url().isEmpty();
 		}
 
         /**
-         * Send chat message <br>
-         * If the text more than 2000 characters, it fails and return {@code null}<br>
-         * For more info about that limit, visit <a href="https://bot.zapps.me/docs/apis/sendMessage/#:~:text=N%E1%BB%99i%20dung%20v%C4%83n%20b%E1%BA%A3n%20c%E1%BB%A7a%20tin%20nh%E1%BA%AFn%20s%E1%BA%BD%20%C4%91%C6%B0%E1%BB%A3c%20g%E1%BB%ADi%2C%20v%E1%BB%9Bi%20%C4%91%E1%BB%99%20d%C3%A0i%20t%E1%BB%AB%201%20%C4%91%E1%BA%BFn%202000%20k%C3%BD%20t%E1%BB%B1">here</a>
-         * @param chatId Obtained by using {@code update.message().chat().id()} in your custom {@link Handler} class
-         * @param text Text to send.
-         * @return {@link Message}, can be ignored or {@code null}, or handle it yourself lmao
+         * Gửi tin nhắn (dạng văn bản)<br>
+         * Nếu văn bản quá 2000 kí tự thì nó trả về {@code null} và không gửi gì cả<br>
+         * Muốn thêm thông tin về limit này, đọc ở <a href="https://bot.zapps.me/docs/apis/sendMessage/#:~:text=N%E1%BB%99i%20dung%20v%C4%83n%20b%E1%BA%A3n%20c%E1%BB%A7a%20tin%20nh%E1%BA%AFn%20s%E1%BA%BD%20%C4%91%C6%B0%E1%BB%A3c%20g%E1%BB%ADi%2C%20v%E1%BB%9Bi%20%C4%91%E1%BB%99%20d%C3%A0i%20t%E1%BB%AB%201%20%C4%91%E1%BA%BFn%202000%20k%C3%BD%20t%E1%BB%B1">đây</a>
+         * @param chatId Dùng {@code update.message().chat().id()} để lấy nó, trong cái {@link Handler} của bạn
+         * @param text Văn bản
+		 * @param replyMessageID ID tin nhắn để reply, có cũng được, không thì để thành {@code null}
+         * @return {@link Message} hoặc {@code null}, có thể bỏ qua, hoặc lấy dữ liệu nếu cần
          */
-		public CompletableFuture<Message> sendMessage(String chatId, String text) {
-			if (over2000(text)) {
-				System.out.println("Text to send, its too long: " + text.length());
+		public CompletableFuture<Message> sendMessage(String chatId, String text, @Nullable String replyMessageID) {
+			if (over2000char(text)) {
+				System.out.println("Kí tự quá nhiều: " + text.length() + " từ. Tối đa: 2000 kí tự.");
 				return null;
 			}
 			ObjectNode requestData = _mapper.createObjectNode();
 			requestData.put("chat_id", chatId);
 			requestData.put("text", text);
+			if  (replyMessageID != null) {
+				requestData.put("reply_to_message_id", replyMessageID);
+			}
 			RequestBody body = RequestBody.create(requestData.toString(), _JSON);
 			return _doPost("sendMessage", body, new TypeReference<>() {});
 		}
 
         /**
-		 * Send chat status to user (Typing, Uploading photos (still beta))
-         * @param chatId Obtained by using {@code update.message().chat().id()} in your custom {@link Handler} class
+		 * Gửi hành động trả lời tin nhắn<br>
+		 * Có thể là {@link ChatActions}{@code .TYPING} (đang nhập tin nhắn...)<br>
+		 * hoặc 1 số khác trong class {@link ChatActions}, nhưng vẫn còn đang thử nghiệm<br>
+		 * Sẽ biến mất sau khoảng 10 giây từ lúc method này được gọi, hoặc khi method liên quan đến gửi tin nhắn được gọi
+         * @param chatId Dùng {@code update.message().chat().id()} để lấy nó trong cái {@link Handler} của bạn
          * @param action {@link ChatActions}
-         * @return Can be ignored.
+         * @return {@code true} nếu đã được gửi, ngược lại thì {@code false}<br>
+		 * Có thể bỏ qua, do cũng chả có gì để sử dụng ở đây cả
          */
 		public CompletableFuture<Boolean> sendChatAction(String chatId, ChatActions action) {
 			ObjectNode requestData = _mapper.createObjectNode();
@@ -276,22 +292,22 @@ public class ZaloBot {
 		}
 
         /**
-		 * Send a photo message (also add a caption if {@code photoCaption} is not {@code null} <br>
-		 * If the photo caption is more than 2000 characters, it will get ignored<br>
-		 * For more info about that limit, visit <a href="https://bot.zapps.me/docs/apis/sendPhoto/#:~:text=N%E1%BB%99i%20dung%20v%C4%83n%20b%E1%BA%A3n%20c%E1%BB%A7a%20tin%20nh%E1%BA%AFn%20s%E1%BA%BD%20%C4%91%C6%B0%E1%BB%A3c%20g%E1%BB%ADi%20k%C3%A8m%2C%20v%E1%BB%9Bi%20%C4%91%E1%BB%99%20d%C3%A0i%20t%E1%BB%AB%201%20%C4%91%E1%BA%BFn%202000%20k%C3%BD%20t%E1%BB%B1">here</a>
-         * @param chatId Obtained by using {@code update.message().chat().id()} in your custom {@link Handler} class
-         * @param photoUrl Direct URL of your photo
-         * @param photoCaption A small text under the photo, can be {@code null} or not more than 2000 characters
-         * @return {@link Message}, can be ignored, or handle it yourself lmao
+		 * Gửi tin nhắn (dạng hình ảnh, có thể kèm theo chú thích)<br>
+		 * Nếu chú thích ảnh quá 2000 kí tự thì nó sẽ bị bỏ qua<br>
+		 * Muốn thêm thông tin về limit này, đọc ở <a href="https://bot.zapps.me/docs/apis/sendPhoto/#:~:text=N%E1%BB%99i%20dung%20v%C4%83n%20b%E1%BA%A3n%20c%E1%BB%A7a%20tin%20nh%E1%BA%AFn%20s%E1%BA%BD%20%C4%91%C6%B0%E1%BB%A3c%20g%E1%BB%ADi%20k%C3%A8m%2C%20v%E1%BB%9Bi%20%C4%91%E1%BB%99%20d%C3%A0i%20t%E1%BB%AB%201%20%C4%91%E1%BA%BFn%202000%20k%C3%BD%20t%E1%BB%B1">đây</a>
+         * @param chatId Dùng {@code update.message().chat().id()} để lấy nó trong cái {@link Handler} của bạn
+         * @param photoUrl URL dẫn thẳng tới hình, không phải link rút gọn đâu nhé<br>
+		 * Ví dụ: https://i.imgur.com/tk59bD7.png
+         * @param photoCaption Cái chú thích nho nhỏ, không đặt thì set {@code null}
+         * @return {@link Message}, có thể bỏ qua, hoặc lấy dữ liệu nếu cần
          */
-		@SuppressWarnings("unchecked")
 		public CompletableFuture<Message> sendPhoto(String chatId, String photoUrl, @Nullable String photoCaption) {
 			ObjectNode requestData = _mapper.createObjectNode();
 			requestData.put("chat_id", chatId);
 			requestData.put("photo", photoUrl);
 			if (photoCaption != null) {
-				if (over2000(photoCaption)) {
-					System.out.println("photoCaption is exceed 2000 characters, this will be ignored and not append into payload.");
+				if (over2000char(photoCaption)) {
+					System.out.println("Warning: Chú thích ảnh vượt quá 2000 kí tự, sẽ không được add vào và gửi đi.");
 				} else {
 					requestData.put("caption", photoCaption);
 				}
@@ -299,7 +315,21 @@ public class ZaloBot {
 			RequestBody body = RequestBody.create(requestData.toString(), _JSON);
 			return _doPost("sendPhoto", body, new TypeReference<>() {});
 		}
-		// TODO: send Sticker (it's impossible for now lol)
+
+        /**
+		 * Gửi tin nhắn (dạng sticker)<br>
+		 * (này rối răm vãi lìn ra)
+         * @param chatId Dùng {@code update.message().chat().id()} để lấy nó trong cái {@link Handler} của bạn
+         * @param stickerId ID của sticker, muốn thêm thông tin, đọc ở  <a href="https://bot.zapps.me/docs/apis/sendSticker/#:~:text=cu%E1%BB%99c%20tr%C3%B2%20chuy%E1%BB%87n-,sticker,-String">đây</a>
+         * @return {@link Message}, có thể bỏ qua, hoặc lấy dữ liệu nếu cần
+         */
+		public CompletableFuture<Message> sendSticker(String chatId, String stickerId) {
+			ObjectNode requestData = _mapper.createObjectNode();
+			requestData.put("chat_id", chatId);
+			requestData.put("sticker", stickerId);
+			RequestBody body = RequestBody.create(requestData.toString(), _JSON);
+			return _doPost("sendSticker", body, new TypeReference<>() {});
+		}
 	}
 
 // ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -312,7 +342,7 @@ public class ZaloBot {
                     if (serverData.expectedSecretToken() != null && !serverData.expectedSecretToken().isEmpty()) {
                         String receivedToken = exchange.getRequestHeaders().getFirst("X-Bot-Api-Secret-Token");
                         if (!serverData.expectedSecretToken().equals(receivedToken)) {
-                            System.err.println("SECURITY ALERT: Blocked an unauthorized webhook attempt!");
+                            System.err.println("BẢO MẬT: Đã block client truy cập không phép (thiếy header auth/header auth không giống như đã đặt).");
                             exchange.sendResponseHeaders(401, -1);
                             exchange.close();
                             return;
@@ -333,7 +363,7 @@ public class ZaloBot {
                                     _processUpdate(received);
                                 }
                             } catch (Exception e) {
-                                System.err.println("JSON Parse Error: " + e.getMessage());
+                                System.err.println("Lỗi parse json: " + e.getMessage());
                             }
                         });
 
@@ -348,9 +378,10 @@ public class ZaloBot {
             });
 			this._webhookServer.setExecutor(Executors.newCachedThreadPool());
 			this._webhookServer.start();
-			System.out.println("Webhook Server listening on port " + serverData.port());
+			this._isServerStarted = true;
+			System.out.println("Webhook Server đang được mở tại port " + serverData.port());
 		} catch (IOException e) {
-			throw new RuntimeException("Failed to start server", e);
+			throw new RuntimeException("Mở server thất bại: ", e);
 		}
 	}
 
@@ -374,7 +405,7 @@ public class ZaloBot {
 			public void onResponse(@NotNull Call call, @NotNull Response response) {
 				try (ResponseBody body = response.body()) {
 					if (body == null) {
-						future.completeExceptionally(new RuntimeException("Empty body, i don't think it's fine."));
+						future.completeExceptionally(new RuntimeException("Body trống, không nghĩ nó sẽ tốt đâu."));
 						return;
 					}
 					Generic<T> apiResponse = _mapper.readValue(body.string(), rep);
@@ -382,7 +413,7 @@ public class ZaloBot {
 						future.complete(apiResponse.result());
 					} else {
 						future.completeExceptionally(new RuntimeException(
-								"API Error " + apiResponse.errorCode() + ": " + apiResponse.description()
+								"Lỗi API (" + apiResponse.errorCode() + "): " + apiResponse.description()
 						));
 					}
 				} catch (IOException e) {

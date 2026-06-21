@@ -9,13 +9,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * Handle commands, like /start, /echo [args].
- */
 public class CommandHandler implements Handler {
     private final String command;
     private final CommandCallback callback;
 
+    /**
+     * Handler cho các lệnh (các tin nhắn bắt đầu bằng "/")
+     * @param command Tên lệnh muốn catch
+     * @param callback Đống code sẽ chạy khi có lệnh được gửi<br>
+     * Có thể dùng các web API ở đây
+     */
     public CommandHandler(String command, CommandCallback callback) {
         this.command = command.toLowerCase();
         this.callback = callback;
