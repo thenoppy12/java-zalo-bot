@@ -6,8 +6,19 @@ import neuralseal.fkrystal.zalobot.WebhookServerData;
 import neuralseal.fkrystal.zalobot.ChatActions;
 import neuralseal.fkrystal.zalobot.utils.NgrokUtils;
 
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+
 public class Test {
     public static void main(String[] args) {
+        // dùng utf-8, in mấy chữ tiếng Việt cho dễ dùng :P
+        try {
+            System.setOut(new PrintStream(new FileOutputStream(FileDescriptor.out), true, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            System.err.println("UTF-8 khong duoc ho tro, cac chu cai tieng Viet se bi loi!");
+        }
         String BOT_TOKEN = "get yourself one.";
         String NGROK_TOKEN = "ngrok token for uhhh .-. webhook ?";
         String WEBHOOK_SECRET = "secure webhook token lol";
