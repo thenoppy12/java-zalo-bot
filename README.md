@@ -6,6 +6,7 @@
 ```gradle
 # build.gradle
 repositories {
+    mavenCentral()
     maven {
         name = "FkrystalMaven"
         url = uri("https://maven.fkrystal.qzz.io/releases")

@@ -3,7 +3,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id("com.google.osdetector").version("1.7.3")
-    id("com.gradleup.shadow").version("9.2.0")
+//    id("com.gradleup.shadow").version("9.2.0")
 }
 
 group = 'neuralseal.fkrystal.zalobot'
@@ -16,34 +16,35 @@ java {
 
 publishing {
     publications {
-        shaded(MavenPublication) {
-            groupId = 'neuralseal.fkrystal'
-            artifactId = "zalo-api-shaded"
-            version = project.version
-
-            from components.shadow
-            artifact sourcesJar
-            artifact javadocJar
-
-            pom {
-                name.set("JavaZaloAPI")
-                description.set("python-zalo-api but its java-lish!")
-                url.set("https://github.com/thenoppy12/java-zalo-bot")
-                licenses {
-                    license {
-                        name.set("CC0 1.0 Unversal")
-                        url.set("https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt")
-                    }
-                }
-            }
-        }
+//        shaded(MavenPublication) {
+//            groupId = 'neuralseal.fkrystal'
+//            artifactId = "zalo-api-shaded"
+//            version = project.version
+//
+//            from components.shadow
+//            artifact sourcesJar
+//            artifact javadocJar
+//
+//            pom {
+//                name.set("JavaZaloAPI")
+//                description.set("python-zalo-api but its java-lish!")
+//                url.set("https://github.com/thenoppy12/java-zalo-bot")
+//                licenses {
+//                    license {
+//                        name.set("CC0 1.0 Unversal")
+//                        url.set("https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt")
+//                    }
+//                }
+//            }
+//        }
         normal(MavenPublication) {
             groupId = 'neuralseal.fkrystal'
             artifactId = "zalo-api"
             version = project.version
-            artifact jar
-            artifact sourcesJar
-            artifact javadocJar
+            from(components["java"])
+//            artifact jar
+//            artifact sourcesJar
+//            artifact javadocJar
             pom {
                 name.set("JavaZaloAPI")
                 description.set("python-zalo-api but its java-lish!")
@@ -91,11 +92,11 @@ jar {
     }
 }
 
-shadowJar {
-    archiveBaseName.set("${group}-${version}")
-    archiveClassifier.set("")
-    relocate("com.ngrok", "neuralseal.fkrystal.zalobot.libraries.ngrok")
-    relocate("org.slf4j", "neuralseal.fkrystal.zalobot.libraries.slf4j")
-    mergeServiceFiles()
-    configurations = [project.configurations.runtimeClasspath]
-}
+//shadowJar {
+//    archiveBaseName.set("${group}-${version}")
+//    archiveClassifier.set("")
+//    relocate("com.ngrok", "neuralseal.fkrystal.zalobot.libraries.ngrok")
+//    relocate("org.slf4j", "neuralseal.fkrystal.zalobot.libraries.slf4j")
+//    mergeServiceFiles()
+//    configurations = [project.configurations.runtimeClasspath]
+//}
