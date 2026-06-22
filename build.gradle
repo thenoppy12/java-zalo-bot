@@ -3,6 +3,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id("com.google.osdetector").version("1.7.3")
+    id("com.gradleup.shadow").version("9.2.0")
 }
 
 group = 'neuralseal.fkrystal.zalobot'
@@ -15,13 +16,34 @@ java {
 
 publishing {
     publications {
-        maven(MavenPublication) {
+        shaded(MavenPublication) {
+            groupId = 'neuralseal.fkrystal'
+            artifactId = "zalo-api-shaded"
+            version = project.version
+
+            from components.shadow
+            artifact sourcesJar
+            artifact javadocJar
+
+            pom {
+                name.set("JavaZaloAPI")
+                description.set("python-zalo-api but its java-lish!")
+                url.set("https://github.com/thenoppy12/java-zalo-bot")
+                licenses {
+                    license {
+                        name.set("CC0 1.0 Unversal")
+                        url.set("https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt")
+                    }
+                }
+            }
+        }
+        normal(MavenPublication) {
             groupId = 'neuralseal.fkrystal'
             artifactId = "zalo-api"
-            version = '21.6'
-
-            from(components["java"])
-
+            version = project.version
+            artifact jar
+            artifact sourcesJar
+            artifact javadocJar
             pom {
                 name.set("JavaZaloAPI")
                 description.set("python-zalo-api but its java-lish!")
@@ -52,10 +74,10 @@ repositories {
 }
 
 dependencies {
-    implementation("com.ngrok:ngrok-java:1.1.1")
-    implementation("com.ngrok:ngrok-java-native:1.1.1:${osdetector.classifier}")
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.21.2'
-    implementation 'org.slf4j:slf4j-api:2.0.7'
+    implementation "com.ngrok:ngrok-java:1.1.1"
+    implementation "com.ngrok:ngrok-java-native:1.1.1:${osdetector.classifier}"
+    api 'com.fasterxml.jackson.core:jackson-databind:2.22.0'
+    implementation 'org.slf4j:slf4j-api:2.0.17'
     api("com.squareup.okhttp3:okhttp:5.1.0")
 }
 
@@ -67,4 +89,13 @@ jar {
                 "Contact-Me": "https://www.facebook.com/fkrystal.noppy/"
         )
     }
+}
+
+shadowJar {
+    archiveBaseName.set("${group}-${version}")
+    archiveClassifier.set("")
+    relocate("com.ngrok", "neuralseal.fkrystal.zalobot.libraries.ngrok")
+    relocate("org.slf4j", "neuralseal.fkrystal.zalobot.libraries.slf4j")
+    mergeServiceFiles()
+    configurations = [project.configurations.runtimeClasspath]
 }
